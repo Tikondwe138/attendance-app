@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Admin Attendance Report - Attendance System{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-semibold mb-6">Admin Attendance Report</h2>
+
+<div class="bg-white p-6 rounded shadow-md mb-6">
+  <div class="grid md:grid-cols-4 gap-4">
+    <div>
+      <label class="block mb-1">Student ID</label>
+      <input id="filterStudent" type="text" placeholder="STU001" class="w-full p-2 border rounded" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Subject</label>
+      <select id="filterSubject" class="w-full p-2 border rounded">
+        <option value="">All</option>
+        <option value="Artificial Inteligence">Artificial Inteligence</option>
+        <option value="Web Design">Web Design</option>
+        <option value="Project Management">Project Management</option>
+        <option value="Software Development">Software Development</option>
+        <option value="Database Systems">Database Systems</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1">Date</label>
+      <input id="filterDate" type="date" class="w-full p-2 border rounded" />
+    </div>
+
+    <div class="flex items-end">
+      <button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">Filter</button>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white p-6 rounded shadow-md">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-semibold">Attendance Records</h3>
+    <button id="exportBtn" class="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600">Export CSV</button>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse" id="adminAttendanceTable">
+      <thead>
+        <tr>
+          <th class="border-b p-2">Student ID</th>
+          <th class="border-b p-2">Subject</th>
+          <th class="border-b p-2">Date</th>
+          <th class="border-b p-2">Time</th>
+          <th class="border-b p-2">Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  async function fetchAdminAttendance() {
+    const studentId = document.getElementById('filterStudent').value.trim();
+    const subject = document.getElementById('filterSubject').value;
+    const date = document.getElementById('filterDate').value;
+
+    let url = `/api/attendance/report?`;
+    if (studentId) url += `student_id=${encodeURIComponent(studentId)}&`;
+    if (subject) url += `subject=${encodeURIComponent(subject)}&`;
+    if (date) url += `date=${encodeURIComponent(date)}&`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const tbody = document.querySelector('#adminAttendanceTable tbody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No records found</td></tr>';
+      return;
+    }
+
+    data.forEach(record => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2 border-b">${record.student_id}</td>
+        <td class="p-2 border-b">${record.subject}</td>
+        <td class="p-2 border-b">${record.date}</td>
+        <td class="p-2 border-b">${record.time}</td>
+        <td class="p-2 border-b">${record.status.charAt(0).toUpperCase() + record.status.slice(1)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filterBtn').onclick = fetchAdminAttendance;
+
+  document.getElementById('exportBtn').onclick = function () {
+    const studentId = document.getElementById('filterStudent').value.trim();
+    const subject = document.getElementById('filterSubject').value;
+    const date = document.getElementById('filterDate').value;
+
+    let url = `/api/attendance/export/csv?`;
+    if (studentId) url += `student_id=${encodeURIComponent(studentId)}&`;
+    if (subject) url += `subject=${encodeURIComponent(subject)}&`;
+    if (date) url += `date=${encodeURIComponent(date)}&`;
+
+    window.open(url, '_blank');
+  };
+
+  window.onload = fetchAdminAttendance;
+</script>
+{% endblock %}

@@ -1,34 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile - Attendance System</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-  <nav class="bg-white shadow p-4 flex justify-between">
-    <div class="font-bold">Attendance System</div>
-    <div>
-      <a href="profile.html" class="mr-4 text-blue-500 hover:underline">Profile</a>
-      <a href="attendance.html" class="mr-4 text-blue-500 hover:underline">Attendance</a>
-      <a href="login.html" class="text-red-500 hover:underline">Logout</a>
-    </div>
-  </nav>
-  <div class="p-6">
-    <h2 class="text-xl font-semibold mb-4">Student Profile</h2>
-    <form class="bg-white p-6 rounded shadow-md">
-      <label class="block mb-2">Name</label>
-      <input type="text" class="w-full mb-4 p-2 border rounded" />
+{% extends "base.html" %}
+{% block title %}Profile - Attendance System{% endblock %}
 
-      <label class="block mb-2">Email</label>
-      <input type="email" class="w-full mb-4 p-2 border rounded" />
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Student Profile</h2>
+<form id="profileForm" class="bg-white p-6 rounded shadow-md max-w-lg" onsubmit="event.preventDefault(); updateProfile();">
+  <label class="block mb-2">Name</label>
+  <input id="name" type="text" class="w-full mb-4 p-2 border rounded" required />
 
-      <label class="block mb-2">Enrollment Number</label>
-      <input type="text" class="w-full mb-4 p-2 border rounded" />
+  <label class="block mb-2">Email</label>
+  <input id="email" type="email" class="w-full mb-4 p-2 border rounded" required />
 
-      <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" type="submit">Update Profile</button>
-    </form>
-  </div>
-</body>
-</html>
+  <label class="block mb-2">Enrollment Number</label>
+  <input id="student_id" type="text" class="w-full mb-4 p-2 border rounded" readonly />
+
+  <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" type="submit">Update Profile</button>
+</form>
+
+<div class="bg-white p-6 rounded shadow-md max-w-lg mt-8">
+  <h3 class="text-lg font-semibold mb-4">Attendance Summary</h3>
+  <ul class="list-disc list-inside mb-6">
+    <li><strong>Present:</strong> <span id="presentCount">0</span></li>
+    <li><strong>Absent:</strong> <span id="absentCount">0</span></li>
+    <li><strong>Late:</strong> <span id="lateCount">0</span></li>
+  </ul>
+
+  <h3 class="text-lg font-semibold mb-4">Recent Attendance Records</h3>
+  <table class="w-full text-left border-collapse border border-gray-300">
+    <thead>
+      <tr>
+        <th class="border border-gray-300 p-2">Date</th>
+        <th class="border border-gray-300 p-2">Subject</th>
+        <th class="border border-gray-300 p-2">Status</th>
+      </tr>
+    </thead>
+    <tbody id="recentAttendance">
+      <!-- Filled by JS -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Replace this with actual session user id in real app
+  const studentId = "STU001";
+
+  // Fetch user profile & attendance summary on page load
+  async function fetchProfile() {
+    // Mock fetching profile - replace with real API call
+    document.getElementById('student_id').value = studentId;
+    document.getElementById('name').value = "Alice Johnson";
+    document.getElementById('email').value = "alice.johnson@example.com";
+
+    // Fetch attendance summary & recent records
+    const res = await fetch(`/api/attendance/report?student_id=${studentId}`);
+    const records = await res.json();
+
+    let present = 0, absent = 0, late = 0;
+    records.forEach(r => {
+      if(r.status === 'present') present++;
+      else if(r.status === 'absent') absent++;
+      else if(r.status === 'late') late++;
+    });
+
+    document.getElementById('presentCount').textContent = present;
+    document.getElementById('absentCount').textContent = absent;
+    document.getElementById('lateCount').textContent = late;
+
+    const tbody = document.getElementById('recentAttendance');
+    tbody.innerHTML = '';
+    // Show last 5 attendance records sorted by date desc
+    records
+      .sort((a,b) => new Date(b.date) - new Date(a.date))
+      .slice(0,5)
+      .forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="border border-gray-300 p-2">${r.date}</td>
+          <td class="border border-gray-300 p-2">${r.subject}</td>
+          <td class="border border-gray-300 p-2 capitalize">${r.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+  }
+
+  async function updateProfile() {
+    // Just a placeholder — would POST updated profile info to backend
+    alert("Profile update feature coming soon!");
+  }
+
+  window.onload = fetchProfile;
+</script>
+{% endblock %}

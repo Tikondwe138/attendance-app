@@ -1,125 +1,159 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Attendance - Attendance System</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-  <nav class="bg-white shadow p-4 flex justify-between">
-    <div class="font-bold">Attendance System</div>
-    <div>
-      <a href="profile.html" class="mr-4 text-blue-500 hover:underline">Profile</a>
-      <a href="attendance.html" class="mr-4 text-blue-500 hover:underline">Attendance</a>
-      <a href="login.html" class="text-red-500 hover:underline">Logout</a>
-    </div>
-  </nav>
-  <div class="p-6">
-    <h2 class="text-xl font-semibold mb-4">Attendance</h2>
-    <form class="bg-white p-6 rounded shadow-md mb-6" id="attendanceForm">
-      <label class="block mb-2">Date</label>
-      <input type="date" class="w-full mb-4 p-2 border rounded" required />
+{% extends "base.html" %}
+{% block title %}Attendance - Attendance System{% endblock %}
 
-      <label class="block mb-2">Time</label>
-      <input type="time" class="w-full mb-4 p-2 border rounded" required />
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Attendance</h2>
 
-      <label class="block mb-2">Subject</label>
-      <select class="w-full mb-4 p-2 border rounded" required>
-        <option value="Artificial Inteligence">Artificial Inteligence</option>
-        <option value="Web Design">Web Design</option>
-        <option value="Project Management">Project Management</option>
-        <option value="Software Development">Software Development</option>
-        <option value="Database Systems">Database Systems</option>
-      </select>
+<form class="bg-white p-6 rounded shadow-md mb-6 max-w-lg" id="attendanceForm">
+  <label class="block mb-2">Student ID</label>
+  <input type="text" id="studentId" class="w-full mb-4 p-2 border rounded" placeholder="e.g., STU001" required />
 
-      <label class="block mb-2">Status</label>
-      <select class="w-full mb-4 p-2 border rounded" required>
-        <option value="present">Present</option>
-        <option value="absent">Absent</option>
-        <option value="late">Late</option>
-      </select>
+  <label class="block mb-2">Date</label>
+  <input type="date" id="dateInput" class="w-full mb-4 p-2 border rounded" required />
 
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Mark Attendance</button>
-    </form>
+  <label class="block mb-2">Time</label>
+  <input type="time" id="timeInput" class="w-full mb-4 p-2 border rounded" required />
 
-    <div class="bg-white p-6 rounded shadow-md">
-      <h3 class="text-lg font-semibold mb-4">Attendance Report</h3>
-      <div class="mb-4">
-        <label class="mr-2">Filter by Subject:</label>
-        <select id="filterSubject" class="p-2 border rounded">
-          <option value="">All</option>
-          <option value="Artificial Inteligence">Artificial Inteligence</option>
-          <option value="Web Design">Web Design</option>
-          <option value="Project Management">Project Management</option>
-          <option value="Software Development">Software Development</option>
-          <option value="Database Systems">Database Systems</option>
-        </select>
-        <label class="ml-4 mr-2">Date:</label>
-        <input type="date" id="filterDate" class="p-2 border rounded">
-        <button id="filterBtn" class="ml-4 bg-blue-500 text-white px-3 py-1 rounded">Filter</button>
-        <button id="exportBtn" class="ml-2 bg-green-500 text-white px-3 py-1 rounded">Export CSV</button>
-      </div>
-      <table class="w-full text-left" id="attendanceTable">
-        <thead>
-          <tr>
-            <th class="border-b p-2">Date</th>
-            <th class="border-b p-2">Time</th>
-            <th class="border-b p-2">Subject</th>
-            <th class="border-b p-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
+  <label class="block mb-2">Subject</label>
+  <select id="subjectInput" class="w-full mb-4 p-2 border rounded" required>
+    <option value="Artificial Intelligence">Artificial Intelligence</option>
+    <option value="Web Design">Web Design</option>
+    <option value="Project Management">Project Management</option>
+    <option value="Software Development">Software Development</option>
+    <option value="Database Systems">Database Systems</option>
+  </select>
+
+  <label class="block mb-2">Status</label>
+  <select id="statusInput" class="w-full mb-4 p-2 border rounded" required>
+    <option value="present">Present</option>
+    <option value="absent">Absent</option>
+    <option value="late">Late</option>
+  </select>
+
+  <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+    Mark Attendance
+  </button>
+  <p id="formMessage" class="text-sm mt-2"></p>
+</form>
+
+<div class="bg-white p-6 rounded shadow-md max-w-4xl">
+  <h3 class="text-lg font-semibold mb-4">Attendance Report</h3>
+
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <label class="mr-2">Student ID:</label>
+    <input type="text" id="filterStudentId" class="p-2 border rounded" placeholder="e.g., STU001" required />
+
+    <label class="mr-2">Filter by Subject:</label>
+    <select id="filterSubject" class="p-2 border rounded">
+      <option value="">All</option>
+      <option value="Artificial Intelligence">Artificial Intelligence</option>
+      <option value="Web Design">Web Design</option>
+      <option value="Project Management">Project Management</option>
+      <option value="Software Development">Software Development</option>
+      <option value="Database Systems">Database Systems</option>
+    </select>
+
+    <label class="ml-4 mr-2">Date:</label>
+    <input type="date" id="filterDate" class="p-2 border rounded" />
+
+    <button id="filterBtn" class="ml-4 bg-blue-500 text-white px-3 py-1 rounded">Filter</button>
+    <button id="exportBtn" class="ml-2 bg-green-500 text-white px-3 py-1 rounded">Export CSV</button>
   </div>
-  <script>
-    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const date = this.querySelector('input[type="date"]').value;
-      const time = this.querySelector('input[type="time"]').value;
-      const subject = this.querySelector('select:nth-of-type(1)').value;
-      const status = this.querySelector('select:nth-of-type(2)').value;
 
-      const table = document.getElementById('attendanceTable').querySelector('tbody');
-      const row = table.insertRow();
-      row.insertCell(0).textContent = date;
-      row.insertCell(1).textContent = time;
-      row.insertCell(2).textContent = subject;
-      row.insertCell(3).textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  <table class="w-full text-left" id="attendanceTable">
+    <thead>
+      <tr>
+        <th class="border-b p-2">Date</th>
+        <th class="border-b p-2">Time</th>
+        <th class="border-b p-2">Subject</th>
+        <th class="border-b p-2">Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
-      this.reset();
+<script>
+  const attendanceForm = document.getElementById('attendanceForm');
+  const formMessage = document.getElementById('formMessage');
+
+  attendanceForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const studentId = document.getElementById('studentId').value.trim();
+    const date = document.getElementById('dateInput').value;
+    const time = document.getElementById('timeInput').value;
+    const subject = document.getElementById('subjectInput').value;
+    const status = document.getElementById('statusInput').value;
+
+    if (!studentId) {
+      formMessage.textContent = "Student ID is required.";
+      formMessage.className = "text-red-500 text-sm mt-2";
+      return;
+    }
+
+    const res = await fetch('/api/attendance/mark', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, date, time, subject, status })
     });
 
-    async function fetchAttendance() {
-      const studentId = "STU001"; // Replace with session/cookie value
-      const subject = document.getElementById('filterSubject').value;
-      const date = document.getElementById('filterDate').value;
-      let url = `/api/attendance/report?student_id=${studentId}`;
-      if(subject) url += `&subject=${encodeURIComponent(subject)}`;
-      if(date) url += `&date=${encodeURIComponent(date)}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const tbody = document.getElementById('attendanceTable').querySelector('tbody');
-      tbody.innerHTML = '';
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="p-2 border-b">${row.date}</td><td class="p-2 border-b">${row.time}</td><td class="p-2 border-b">${row.subject}</td><td class="p-2 border-b">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td>`;
-        tbody.appendChild(tr);
-      });
+    if (res.ok) {
+      formMessage.textContent = "Attendance marked successfully!";
+      formMessage.className = "text-green-500 text-sm mt-2";
+      attendanceForm.reset();
+      fetchAttendance(); // Refresh table
+    } else {
+      const error = await res.json();
+      formMessage.textContent = `Error: ${error.message || 'Something went wrong'}`;
+      formMessage.className = "text-red-500 text-sm mt-2";
     }
-    document.getElementById('filterBtn').onclick = fetchAttendance;
-    document.getElementById('exportBtn').onclick = function() {
-      const studentId = "STU001";
-      const subject = document.getElementById('filterSubject').value;
-      const date = document.getElementById('filterDate').value;
-      let url = `/api/attendance/export/csv?student_id=${studentId}`;
-      if(subject) url += `&subject=${encodeURIComponent(subject)}`;
-      if(date) url += `&date=${encodeURIComponent(date)}`;
-      window.open(url, '_blank');
-    };
-    window.onload = fetchAttendance;
-  </script>
-</body>
-</html>
+  });
+
+  async function fetchAttendance() {
+    const studentId = document.getElementById('filterStudentId').value.trim();
+    if (!studentId) {
+      alert("Please enter a Student ID to view attendance.");
+      return;
+    }
+
+    const subject = document.getElementById('filterSubject').value;
+    const date = document.getElementById('filterDate').value;
+
+    let url = `/api/attendance/report?student_id=${studentId}`;
+    if (subject) url += `&subject=${encodeURIComponent(subject)}`;
+    if (date) url += `&date=${encodeURIComponent(date)}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    const tbody = document.getElementById('attendanceTable').querySelector('tbody');
+    tbody.innerHTML = '';
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2 border-b">${row.date}</td>
+        <td class="p-2 border-b">${row.time}</td>
+        <td class="p-2 border-b">${row.subject}</td>
+        <td class="p-2 border-b">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filterBtn').onclick = fetchAttendance;
+
+  document.getElementById('exportBtn').onclick = function () {
+    const studentId = document.getElementById('filterStudentId').value.trim();
+    if (!studentId) {
+      alert("Enter Student ID to export attendance.");
+      return;
+    }
+    const subject = document.getElementById('filterSubject').value;
+    const date = document.getElementById('filterDate').value;
+
+    let url = `/api/attendance/export/csv?student_id=${studentId}`;
+    if (subject) url += `&subject=${encodeURIComponent(subject)}`;
+    if (date) url += `&date=${encodeURIComponent(date)}`;
+    window.open(url, '_blank');
+  };
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Bulk Attendance - Attendance System{% endblock %}
+
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Mark Bulk Attendance</h2>
+<form id="bulkForm" class="bg-white p-6 rounded shadow-md max-w-xl">
+  <label class="block mb-2">Date</label>
+  <input type="date" id="bulkDate" class="w-full mb-4 p-2 border rounded" required />
+
+  <label class="block mb-2">Time</label>
+  <input type="time" id="bulkTime" class="w-full mb-4 p-2 border rounded" required />
+
+  <label class="block mb-2">Subject</label>
+  <select id="bulkSubject" class="w-full mb-4 p-2 border rounded" required>
+    <option value="Artificial Inteligence">Artificial Inteligence</option>
+    <option value="Web Design">Web Design</option>
+    <option value="Project Management">Project Management</option>
+    <option value="Software Development">Software Development</option>
+    <option value="Database Systems">Database Systems</option>
+  </select>
+
+  <label class="block mb-2">Status</label>
+  <select id="bulkStatus" class="w-full mb-4 p-2 border rounded" required>
+    <option value="present">Present</option>
+    <option value="absent">Absent</option>
+    <option value="late">Late</option>
+  </select>
+
+  <label class="block mb-2">Select Students (Hold Ctrl to select multiple)</label>
+  <select id="studentList" class="w-full mb-4 p-2 border rounded" multiple size="10" required>
+    <!-- Ideally, fetch dynamically, but hardcoded for now -->
+    <option value="STU001">Alice Johnson</option>
+    <option value="STU002">Bob Smith</option>
+    <option value="STU003">Charlie Brown</option>
+    <option value="STU004">Diana Prince</option>
+  </select>
+
+  <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Submit Bulk</button>
+</form>
+
+<script>
+  document.getElementById('bulkForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const students = Array.from(document.getElementById('studentList').selectedOptions).map(opt => opt.value);
+    if (!students.length) {
+      alert('Please select at least one student!');
+      return;
+    }
+
+    const data = {
+      student_ids: students,
+      subject: document.getElementById('bulkSubject').value,
+      date: document.getElementById('bulkDate').value,
+      time: document.getElementById('bulkTime').value,
+      status: document.getElementById('bulkStatus').value
+    };
+
+    try {
+      const res = await fetch('/api/attendance/mark/bulk', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message || result.error);
+    } catch (err) {
+      alert('Failed to submit bulk attendance. Try again.');
+    }
+  });
+</script>
+{% endblock %}
