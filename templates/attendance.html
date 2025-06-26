@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance - Attendance System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-white shadow p-4 flex justify-between">
+    <div class="font-bold">Attendance System</div>
+    <div>
+      <a href="profile.html" class="mr-4 text-blue-500 hover:underline">Profile</a>
+      <a href="attendance.html" class="mr-4 text-blue-500 hover:underline">Attendance</a>
+      <a href="login.html" class="text-red-500 hover:underline">Logout</a>
+    </div>
+  </nav>
+  <div class="p-6">
+    <h2 class="text-xl font-semibold mb-4">Attendance</h2>
+    <form class="bg-white p-6 rounded shadow-md mb-6" id="attendanceForm">
+      <label class="block mb-2">Date</label>
+      <input type="date" class="w-full mb-4 p-2 border rounded" required />
+
+      <label class="block mb-2">Time</label>
+      <input type="time" class="w-full mb-4 p-2 border rounded" required />
+
+      <label class="block mb-2">Subject</label>
+      <select class="w-full mb-4 p-2 border rounded" required>
+        <option value="Artificial Inteligence">Artificial Inteligence</option>
+        <option value="Web Design">Web Design</option>
+        <option value="Project Management">Project Management</option>
+        <option value="Software Development">Software Development</option>
+        <option value="Database Systems">Database Systems</option>
+      </select>
+
+      <label class="block mb-2">Status</label>
+      <select class="w-full mb-4 p-2 border rounded" required>
+        <option value="present">Present</option>
+        <option value="absent">Absent</option>
+        <option value="late">Late</option>
+      </select>
+
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Mark Attendance</button>
+    </form>
+
+    <div class="bg-white p-6 rounded shadow-md">
+      <h3 class="text-lg font-semibold mb-4">Attendance Report</h3>
+      <div class="mb-4">
+        <label class="mr-2">Filter by Subject:</label>
+        <select id="filterSubject" class="p-2 border rounded">
+          <option value="">All</option>
+          <option value="Artificial Inteligence">Artificial Inteligence</option>
+          <option value="Web Design">Web Design</option>
+          <option value="Project Management">Project Management</option>
+          <option value="Software Development">Software Development</option>
+          <option value="Database Systems">Database Systems</option>
+        </select>
+        <label class="ml-4 mr-2">Date:</label>
+        <input type="date" id="filterDate" class="p-2 border rounded">
+        <button id="filterBtn" class="ml-4 bg-blue-500 text-white px-3 py-1 rounded">Filter</button>
+        <button id="exportBtn" class="ml-2 bg-green-500 text-white px-3 py-1 rounded">Export CSV</button>
+      </div>
+      <table class="w-full text-left" id="attendanceTable">
+        <thead>
+          <tr>
+            <th class="border-b p-2">Date</th>
+            <th class="border-b p-2">Time</th>
+            <th class="border-b p-2">Subject</th>
+            <th class="border-b p-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const date = this.querySelector('input[type="date"]').value;
+      const time = this.querySelector('input[type="time"]').value;
+      const subject = this.querySelector('select:nth-of-type(1)').value;
+      const status = this.querySelector('select:nth-of-type(2)').value;
+
+      const table = document.getElementById('attendanceTable').querySelector('tbody');
+      const row = table.insertRow();
+      row.insertCell(0).textContent = date;
+      row.insertCell(1).textContent = time;
+      row.insertCell(2).textContent = subject;
+      row.insertCell(3).textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+      this.reset();
+    });
+
+    async function fetchAttendance() {
+      const studentId = "STU001"; // Replace with session/cookie value
+      const subject = document.getElementById('filterSubject').value;
+      const date = document.getElementById('filterDate').value;
+      let url = `/api/attendance/report?student_id=${studentId}`;
+      if(subject) url += `&subject=${encodeURIComponent(subject)}`;
+      if(date) url += `&date=${encodeURIComponent(date)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const tbody = document.getElementById('attendanceTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="p-2 border-b">${row.date}</td><td class="p-2 border-b">${row.time}</td><td class="p-2 border-b">${row.subject}</td><td class="p-2 border-b">${row.status.charAt(0).toUpperCase() + row.status.slice(1)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    document.getElementById('filterBtn').onclick = fetchAttendance;
+    document.getElementById('exportBtn').onclick = function() {
+      const studentId = "STU001";
+      const subject = document.getElementById('filterSubject').value;
+      const date = document.getElementById('filterDate').value;
+      let url = `/api/attendance/export/csv?student_id=${studentId}`;
+      if(subject) url += `&subject=${encodeURIComponent(subject)}`;
+      if(date) url += `&date=${encodeURIComponent(date)}`;
+      window.open(url, '_blank');
+    };
+    window.onload = fetchAttendance;
+  </script>
+</body>
+</html>
