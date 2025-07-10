@@ -1,13 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Profile</title>
-</head>
-<body>
-    <h1>User Profile</h1>
-    <div id="profile-info">
-        <!-- Profile details go here -->
+{% extends "base.html" %}
+{% block title %}Profile - Attendance System{% endblock %}
+
+{% block content %}
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">Welcome, {{ user }} 👋</h1>
+    
+    <div class="bg-white p-6 rounded shadow-md">
+      <p class="text-gray-700">This is your profile page. More features coming soon!</p>
+
+      <!-- Example static data (replace with dynamic data from DB if needed) -->
+      <p class="mt-4 text-gray-600">Email: <span class="font-medium">{{ user }}@example.com</span></p>
+      <p class="text-gray-600">Enrollment Number: <span class="font-medium">123456</span></p>
+
+      <button class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Edit Profile</button>
     </div>
-</body>
-</html>
+  </div>
+{% endblock %}

@@ -1,2 +1,4 @@
-flask
-sqlite3
+flask==3.1.1
+flask_sqlalchemy==3.1.1
+flask_cors==4.0.0
+

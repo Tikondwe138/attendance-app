@@ -5,22 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Attendance System{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script defer>
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+  </script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
   {% if not hide_navbar %}
-  <nav class="bg-white shadow p-4 flex justify-between items-center">
-    <div class="font-bold text-xl text-gray-800">Attendance System</div>
-    <div class="flex items-center gap-4">
-      <a href="{{ url_for('profile') }}" class="text-blue-500 hover:underline">Profile</a>
-      <a href="{{ url_for('attendance') }}" class="text-blue-500 hover:underline">Attendance</a>
-      <a href="{{ url_for('attendance.attendance_report_admin') }}" class="text-blue-500 hover:underline">Reports</a>
-      <a href="{{ url_for('login') }}" class="text-red-500 hover:underline">Logout</a>
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md px-4 py-4 flex justify-between items-center">
+    <div class="text-xl font-bold text-gray-800">Attendance System</div>
+
+    <div class="hidden md:flex gap-6 items-center">
+      <a href="{{ url_for('auth.profile') }}"
+         class="{% if request.path == url_for('auth.profile') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+         Profile
+      </a>
+      <a href="{{ url_for('attendance.attendance') }}"
+         class="{% if request.path == url_for('attendance.attendance') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+         Attendance
+      </a>
+
+      {% if session.get('user') and session.get('role') == 'admin' %}
+      <a href="{{ url_for('attendance.attendance_report_admin') }}"
+         class="{% if request.path == url_for('attendance.attendance_report_admin') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+         Reports
+      </a>
+      <a href="{{ url_for('attendance.bulk_attendance') }}"
+         class="{% if request.path == url_for('attendance.bulk_attendance') %}text-purple-600 font-semibold{% else %}text-gray-600 hover:text-purple-500{% endif %}">
+         Bulk Attendance
+      </a>
+      {% endif %}
+
+      <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:underline">Logout</a>
     </div>
+
+    <!-- Hamburger Icon (Mobile) -->
+    <button class="md:hidden focus:outline-none" onclick="toggleMobileMenu()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
   </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="md:hidden bg-white shadow-md px-4 py-2 space-y-2 hidden">
+    <a href="{{ url_for('auth.profile') }}"
+       class="block {% if request.path == url_for('auth.profile') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+       Profile
+    </a>
+    <a href="{{ url_for('attendance.attendance') }}"
+       class="block {% if request.path == url_for('attendance.attendance') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+       Attendance
+    </a>
+
+    {% if session.get('user') and session.get('role') == 'admin' %}
+    <a href="{{ url_for('attendance.attendance_report_admin') }}"
+       class="block {% if request.path == url_for('attendance.attendance_report_admin') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+       Reports
+    </a>
+    <a href="{{ url_for('attendance.bulk_attendance') }}"
+       class="block {% if request.path == url_for('attendance.bulk_attendance') %}text-purple-600 font-semibold{% else %}text-gray-600 hover:text-purple-500{% endif %}">
+       Bulk Attendance
+    </a>
+    {% endif %}
+
+    <a href="{{ url_for('auth.logout') }}" class="block text-red-500 hover:underline">Logout</a>
+  </div>
   {% endif %}
 
-  <main class="flex-grow p-6">
+  <!-- Page Content -->
+  <main class="flex-grow p-6 max-w-5xl mx-auto w-full">
     {% block content %}{% endblock %}
   </main>
 

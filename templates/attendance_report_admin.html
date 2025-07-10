@@ -2,20 +2,23 @@
 {% block title %}Admin Attendance Report - Attendance System{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-semibold mb-6">Admin Attendance Report</h2>
+<h2 class="text-2xl font-bold text-gray-800 mb-6">🧑‍💼 Admin Attendance Report</h2>
 
-<div class="bg-white p-6 rounded shadow-md mb-6">
-  <div class="grid md:grid-cols-4 gap-4">
+<!-- Filter Form -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-8">
+  <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <div>
-      <label class="block mb-1">Student ID</label>
-      <input id="filterStudent" type="text" placeholder="STU001" class="w-full p-2 border rounded" />
+      <label for="filterStudent" class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+      <input id="filterStudent" type="text" placeholder="STU001"
+        class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
     </div>
 
     <div>
-      <label class="block mb-1">Subject</label>
-      <select id="filterSubject" class="w-full p-2 border rounded">
+      <label for="filterSubject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+      <select id="filterSubject"
+        class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
         <option value="">All</option>
-        <option value="Artificial Inteligence">Artificial Inteligence</option>
+        <option value="Artificial Intelligence">Artificial Intelligence</option>
         <option value="Web Design">Web Design</option>
         <option value="Project Management">Project Management</option>
         <option value="Software Development">Software Development</option>
@@ -24,38 +27,49 @@
     </div>
 
     <div>
-      <label class="block mb-1">Date</label>
-      <input id="filterDate" type="date" class="w-full p-2 border rounded" />
+      <label for="filterDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+      <input id="filterDate" type="date"
+        class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
     </div>
 
     <div class="flex items-end">
-      <button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">Filter</button>
+      <button id="filterBtn"
+        class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition">
+        Filter
+      </button>
     </div>
-  </div>
+  </form>
 </div>
 
-<div class="bg-white p-6 rounded shadow-md">
-  <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-semibold">Attendance Records</h3>
-    <button id="exportBtn" class="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600">Export CSV</button>
+<!--  Attendance Records Table -->
+<div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+    <h3 class="text-lg font-semibold text-gray-800">Attendance Records</h3>
+    <button id="exportBtn"
+      class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition">
+      ⬇Export CSV
+    </button>
   </div>
 
   <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse" id="adminAttendanceTable">
-      <thead>
+    <table class="w-full table-auto border-collapse" id="adminAttendanceTable">
+      <thead class="bg-gray-100 text-gray-700">
         <tr>
-          <th class="border-b p-2">Student ID</th>
-          <th class="border-b p-2">Subject</th>
-          <th class="border-b p-2">Date</th>
-          <th class="border-b p-2">Time</th>
-          <th class="border-b p-2">Status</th>
+          <th class="border-b p-2 text-left">Student ID</th>
+          <th class="border-b p-2 text-left">Subject</th>
+          <th class="border-b p-2 text-left">Date</th>
+          <th class="border-b p-2 text-left">Time</th>
+          <th class="border-b p-2 text-left">Status</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody class="text-gray-800">
+        <!-- Dynamic data injected here -->
+      </tbody>
     </table>
   </div>
 </div>
 
+<!--  Script -->
 <script>
   async function fetchAdminAttendance() {
     const studentId = document.getElementById('filterStudent').value.trim();
@@ -74,18 +88,21 @@
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No records found</td></tr>';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-gray-500 py-4">No records found</td>
+        </tr>`;
       return;
     }
 
     data.forEach(record => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="p-2 border-b">${record.student_id}</td>
-        <td class="p-2 border-b">${record.subject}</td>
-        <td class="p-2 border-b">${record.date}</td>
-        <td class="p-2 border-b">${record.time}</td>
-        <td class="p-2 border-b">${record.status.charAt(0).toUpperCase() + record.status.slice(1)}</td>
+        <td class="border-b p-2">${record.student_id}</td>
+        <td class="border-b p-2">${record.subject}</td>
+        <td class="border-b p-2">${record.date}</td>
+        <td class="border-b p-2">${record.time}</td>
+        <td class="border-b p-2 capitalize">${record.status}</td>
       `;
       tbody.appendChild(tr);
     });

@@ -1,28 +1,16 @@
-import sqlite3
-from database.db_config import get_db
+from flask_sqlalchemy import SQLAlchemy
 
-def init_db():
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS attendance (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_id TEXT NOT NULL,
-            subject TEXT NOT NULL,
-            date TEXT NOT NULL,
-            time TEXT NOT NULL,
-            status TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+db = SQLAlchemy()
 
-def mark_attendance(student_id, subject, date, time, status):
-    conn = get_db()
-    c = conn.cursor()
-    c.execute('''
-        INSERT INTO attendance (student_id, subject, date, time, status)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (student_id, subject, date, time, status))
-    conn.commit()
-    conn.close()
+class Attendance(db.Model):
+    __tablename__ = 'attendance'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    status = db.Column(db.String(20), nullable=False)
+
+    def __repr__(self):
+        return f'<Attendance {self.student_id} - {self.subject} on {self.date}>'
