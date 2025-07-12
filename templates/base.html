@@ -5,11 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Attendance System{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <style>
+    /* Smooth fade-in for page content */
+    body {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    body.loaded {
+      opacity: 1;
+    }
+    /* Smooth scroll behavior for internal links */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+
   <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add('loaded');
+    });
+
     function toggleMobileMenu() {
       const menu = document.getElementById('mobileMenu');
       menu.classList.toggle('hidden');
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"])');
+      links.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = link.getAttribute('href');
+          document.body.classList.remove('loaded');
+          setTimeout(() => {
+            window.location.href = href;
+          }, 400);
+        });
+      });
+    });
   </script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -30,8 +64,8 @@
       </a>
 
       {% if session.get('user') and session.get('role') == 'admin' %}
-      <a href="{{ url_for('attendance.attendance_report_admin') }}"
-         class="{% if request.path == url_for('attendance.attendance_report_admin') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+      <a href="{{ url_for('attendance.admin_report_api') }}"
+         class="{% if request.path == url_for('attendance.admin_report_api') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
          Reports
       </a>
       <a href="{{ url_for('attendance.bulk_attendance') }}"
@@ -44,7 +78,7 @@
     </div>
 
     <!-- Hamburger Icon (Mobile) -->
-    <button class="md:hidden focus:outline-none" onclick="toggleMobileMenu()">
+    <button class="md:hidden focus:outline-none" onclick="toggleMobileMenu()" aria-label="Toggle menu">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24"
            stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -65,8 +99,8 @@
     </a>
 
     {% if session.get('user') and session.get('role') == 'admin' %}
-    <a href="{{ url_for('attendance.attendance_report_admin') }}"
-       class="block {% if request.path == url_for('attendance.attendance_report_admin') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
+    <a href="{{ url_for('attendance.admin_report_api') }}"
+       class="block {% if request.path == url_for('attendance.admin_report_api') %}text-blue-600 font-semibold{% else %}text-gray-600 hover:text-blue-500{% endif %}">
        Reports
     </a>
     <a href="{{ url_for('attendance.bulk_attendance') }}"
@@ -86,3 +120,4 @@
 
 </body>
 </html>
+<!-- End of base.html -->

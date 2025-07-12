@@ -9,11 +9,10 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session:
-            flash("You need to log in first 😤", "error")
+            flash("You need to log in first", "error")
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
-
 
 # --- Login Route ---
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -24,16 +23,14 @@ def login():
 
         user_data = validate_login(username, password)
         if user_data:
-            # Store both username and role in session
             session['user'] = user_data['username']
             session['role'] = user_data['role']
             flash(f"Welcome back, {user_data['username']} 🎉", 'success')
             return redirect(url_for('auth.profile'))
         else:
-            flash('Invalid username or password 😬', 'error')
+            flash('Invalid username or password ', 'error')
 
     return render_template('login.html')
-
 
 # --- Profile Route ---
 @auth_bp.route('/profile')
@@ -43,10 +40,9 @@ def profile():
     role = session.get('role')
     return render_template('profile.html', user=username, role=role)
 
-
 # --- Logout Route ---
 @auth_bp.route('/logout')
 def logout():
     session.clear()
-    flash('Logged out successfully 👋', 'info')
+    flash('Logged out successfully ', 'info')
     return redirect(url_for('auth.login'))

@@ -5,23 +5,23 @@
 <div class="p-4 sm:p-6">
   <h2 class="text-2xl font-bold text-gray-800 mb-6"> Mark Bulk Attendance</h2>
   <form id="bulkForm" class="bg-white p-6 rounded-lg shadow-md max-w-2xl space-y-4">
-    
+
     <!-- Date -->
     <div>
       <label for="bulkDate" class="block text-sm font-medium text-gray-700">Date</label>
-      <input type="date" id="bulkDate" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required />
+      <input type="date" id="bulkDate" name="date" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required />
     </div>
 
     <!-- Time -->
     <div>
       <label for="bulkTime" class="block text-sm font-medium text-gray-700">Time</label>
-      <input type="time" id="bulkTime" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required />
+      <input type="time" id="bulkTime" name="time" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required />
     </div>
 
     <!-- Subject -->
     <div>
       <label for="bulkSubject" class="block text-sm font-medium text-gray-700">Subject</label>
-      <select id="bulkSubject" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
+      <select id="bulkSubject" name="subject" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
         <option value="" disabled selected>Select a subject</option>
         <option value="Artificial Intelligence">Artificial Intelligence</option>
         <option value="Web Design">Web Design</option>
@@ -34,7 +34,7 @@
     <!-- Status -->
     <div>
       <label for="bulkStatus" class="block text-sm font-medium text-gray-700">Status</label>
-      <select id="bulkStatus" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
+      <select id="bulkStatus" name="status" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
         <option value="" disabled selected>Select status</option>
         <option value="present">Present</option>
         <option value="absent">Absent</option>
@@ -44,8 +44,10 @@
 
     <!-- Student List -->
     <div>
-      <label for="studentList" class="block text-sm font-medium text-gray-700">Select Students <span class="text-xs text-gray-500">(Hold Ctrl or Cmd to select multiple)</span></label>
-      <select id="studentList" multiple size="8" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
+      <label for="studentList" class="block text-sm font-medium text-gray-700">
+        Select Students <span class="text-xs text-gray-500">(Hold Ctrl or Cmd to select multiple)</span>
+      </label>
+      <select id="studentList" name="student_ids" multiple size="8" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" required>
         <option value="STU001">Alice Johnson</option>
         <option value="STU002">Bob Smith</option>
         <option value="STU003">Charlie Brown</option>
@@ -56,19 +58,21 @@
     <!-- Submit Button -->
     <div class="pt-2">
       <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition">
-        📤 Submit Bulk
+         Submit Bulk
       </button>
     </div>
   </form>
 </div>
 
 <script>
-  document.getElementById('bulkForm').addEventListener('submit', async function(e) {
+  document.getElementById('bulkForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const students = Array.from(document.getElementById('studentList').selectedOptions).map(opt => opt.value);
-    if (!students.length) {
-      alert('Please select at least one student!');
+    const studentSelect = document.getElementById('studentList');
+    const students = Array.from(studentSelect.selectedOptions).map(opt => opt.value);
+
+    if (students.length === 0) {
+      alert(' Please select at least one student.');
       return;
     }
 
@@ -83,13 +87,21 @@
     try {
       const res = await fetch('/api/attendance/mark/bulk', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+
       const result = await res.json();
-      alert(result.message || result.error);
+
+      if (res.ok) {
+        alert(result.message || ' Bulk attendance submitted successfully!');
+        document.getElementById('bulkForm').reset();
+      } else {
+        alert(result.error || ' Error submitting bulk attendance.');
+      }
     } catch (err) {
-      alert('Failed to submit bulk attendance. Try again.');
+      console.error(err);
+      alert(' Something went wrong. Try again.');
     }
   });
 </script>

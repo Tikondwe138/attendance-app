@@ -1,28 +1,36 @@
 # models/user_model.py
 
 # Simulated in-memory user "database"
-# In real-world usage, you'd pull this from an actual database (e.g., SQLite, PostgreSQL, etc.)
+# Pro tip: swap this with real DB later, no sweat
+
 users = {
     "admin": {
         "password": "admin123",
-        "full_name": "Admin User"
+        "full_name": "Admin User",
+        "role": "admin"
     },
     "joel": {
         "password": "password",
-        "full_name": "Joel User"
+        "full_name": "Joel User",
+        "role": "student"
     }
 }
 
-def validate_login(username, password):
+def validate_login(username: str, password: str):
     """
-    Validates login credentials.
-    Returns True if the password matches for the given user.
+    Checks if username + password combo is legit.
+    Returns user dict with username and role if valid; else False.
     """
     user = users.get(username)
-    return user and user["password"] == password
+    if user and user["password"] == password:
+        return {
+            "username": username,
+            "role": user.get("role", "student")
+        }
+    return False
 
-def get_user_details(username):
+def get_user_details(username: str):
     """
-    Returns user details (e.g., full name) for a given username.
+    Returns detailed info about the user (full name, role, etc.).
     """
     return users.get(username)
