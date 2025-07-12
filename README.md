@@ -2,6 +2,30 @@
 
 ## Overview  
 This update covers the progress made on Task 3 of the Attendance System project. The focus was on building features that let students and admins record attendance, view reports, and enjoy a smooth website experience.
+## Updates That Still Need to Be Done  
+1. **User Authentication and Roles**  
+   - Replace the simple in-memory user system with a real database model.  
+   - Add password protection, roles (admin, teacher), and login/logout functionality.  
+   - This controls who can mark attendance and what they’re allowed to do.
+
+2. **Attendance Marking Logic**  
+   - Build the logic to mark attendance for individual students or entire classes at once.  
+   - Support different statuses like present, absent, tardy.  
+   - Add checks to avoid mistakes like marking attendance twice or for invalid dates or students.
+
+3. **Attendance Reporting**  
+   - Create functions to generate reports such as attendance summaries for students, class attendance rates, and lists of absent or tardy students.  
+   - These reports will help admins track attendance effectively.
+
+4. **Tracking Statuses Clearly**  
+   - Define and enforce accepted attendance statuses (present, absent, tardy).  
+   - Validate status during attendance recording to avoid errors.
+
+5. **Proper Model Relationships**  
+   - Improve how attendance records relate to students in the database.  
+   - Ensure database relationships are properly set up to keep data consistent.
+
+---
 
 ## What Has Been Done  
 - Set up login for students and admins with different access levels.  
