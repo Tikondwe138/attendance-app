@@ -1,81 +1,68 @@
 # Attendance System
 
 ## Overview  
-This update covers the progress made on Task 3 of the Attendance System project. The focus was on building features that let students and admins record attendance, view reports, and enjoy a smooth website experience.
-## Updates That Still Need to Be Done  
-1. **User Authentication and Roles**  
-   - Replace the simple in-memory user system with a real database model.  
-   - Add password protection, roles (admin, teacher), and login/logout functionality.  
-   - This controls who can mark attendance and what they’re allowed to do.
-
-2. **Attendance Marking Logic**  
-   - Build the logic to mark attendance for individual students or entire classes at once.  
-   - Support different statuses like present, absent, tardy.  
-   - Add checks to avoid mistakes like marking attendance twice or for invalid dates or students.
-
-3. **Attendance Reporting**  
-   - Create functions to generate reports such as attendance summaries for students, class attendance rates, and lists of absent or tardy students.  
-   - These reports will help admins track attendance effectively.
-
-4. **Tracking Statuses Clearly**  
-   - Define and enforce accepted attendance statuses (present, absent, tardy).  
-   - Validate status during attendance recording to avoid errors.
-
-5. **Proper Model Relationships**  
-   - Improve how attendance records relate to students in the database.  
-   - Ensure database relationships are properly set up to keep data consistent.
+This document outlines the progress and implementation details of the Attendance System project, specifically reflecting the completion of **Task 3**. This task focused on enabling accurate attendance tracking, data validation, and report generation for both individual students and entire classes.
 
 ---
 
-## What Has Been Done  
-- Set up login for students and admins with different access levels.  
-- Students can mark their own attendance via a simple form.  
-- Admins can mark attendance for multiple students at once (bulk attendance).  
-- Created reports that admins can view online or download as spreadsheets (CSV).  
-- Designed a user-friendly and mobile-friendly website with clear navigation and smooth transitions.  
-- Added notifications to inform users when actions succeed or fail.
+## ✅ Task 3: What Was Required and How It's Now Met
 
-## How It Works  
-- Students log in and submit attendance for a given date and time.  
-- Admins log in and can submit attendance for groups, as well as view detailed attendance reports.  
-- All attendance data is saved securely in the system.  
-- Reports are accessible through the website and can be downloaded for offline use.  
-- The website guides users with helpful messages and smooth page changes.
-
-## What Needs Improvement / Next Steps  
-- Ensure all attendance data is reliably saved and shows up correctly in reports.  
-- Add better checks to prevent missing or incorrect data during submission.  
-- Improve admin reports with more filtering options to easily find specific attendance records.  
-- Move sensitive settings to secure places to protect user data.  
-- Continue refining the website’s design and usability based on user feedback.  
-- Develop automatic tests to catch issues early and maintain quality.
+| Requirement | Completed | Explanation |
+|------------|-----------|-------------|
+| **User Roles (student/admin)** | ✅ | Basic login system using a simulated in-memory structure with roles. |
+| **Attendance Status Enforcement** | ✅ | Accepted statuses (`present`, `absent`, `tardy`) are enforced via a defined Enum. |
+| **Record Attendance (Single & Bulk)** | ✅ | Students can self-mark; admins can mark attendance in bulk for classes. |
+| **Avoid Duplicates** | ✅ | System checks for existing records before inserting new ones. |
+| **Reports & Summaries** | ✅ | Functions return summaries by student and subject, including attendance rates. |
+| **Filtered Lists** | ✅ | Can retrieve attendance records filtered by status, subject, and date range. |
+| **Model Relationships** | ✅ | Bidirectional SQLAlchemy relationship between `Student` and `Attendance` models implemented. |
 
 ---
 
-## How to Install and Run the System  
+## Features Completed
 
-1. **Clone the project:**  
-   ```bash
-   git clone [your-repo-url]
-   cd attendance-app
-Set up a Python environment:
-Create a virtual environment to keep things tidy:
+- **Attendance Recording**
+  - Single attendance (per student) with validation.
+  - Bulk attendance (per class) with duplicate checking.
+- **Status Handling**
+  - Centralized enum to define accepted statuses.
+  - Consistent enforcement across all logic layers.
+- **Reporting System**
+  - Attendance summaries for a student between date ranges.
+  - Class-level attendance rate percentage.
+  - Filterable list for absent/tardy records.
+- **Data Modeling**
+  - Proper use of SQLAlchemy relationships between students and their attendance records.
+- **Error Handling**
+  - Database rollback and custom error messages for all failure scenarios.
 
- 
-python -m venv env
-source env/bin/activate  # On Windows use: env\Scripts\activate
-Install required packages:
+---
 
- 
-pip install -r requirements.txt
-Set up the database:
-The system uses SQLite by default. The database file will be created automatically when you run the app.
+## What Still Needs Work (Future Tasks)
 
-Run the app:
+1. **Replace In-Memory Login**
+   - Move to a database-driven authentication system.
+   - Implement hashed passwords, role-based access, and session management.
 
- 
-flask run
-Access the system:
-Open your browser and go to http://127.0.0.1:5000 to start using the attendance system.
+2. **Frontend Integration**
+   - Currently back-end focused. A frontend UI should be built or connected.
 
-Feel free to reach out if you need help with setup or have questions!
+3. **Access Controls**
+   - Restrict which users can view or modify which data (based on role).
+
+4. **Data Validation and UX Improvements**
+   - Add client-side form validation.
+   - Display cleaner messages in the frontend on success or failure.
+
+5. **Testing**
+   - Unit tests for attendance services and reporting logic.
+   - Integration testing for routes once a UI or API is added.
+
+---
+
+## How to Install and Run the System
+
+### 1. Clone the Repository
+```bash
+git clone [your-repo-url]
+cd attendance-app
