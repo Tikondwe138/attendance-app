@@ -1,6 +1,10 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, session
-from models.attendance_model import Attendance, db
 from datetime import datetime
+from models.attendance_model import Attendance
+from services.attendance_service import mark_attendance, mark_class_attendance
+from flask import Response
+import csv
+from io import StringIO
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -13,7 +17,7 @@ def attendance():
 
     if request.method == 'POST':
         try:
-            student_id = session.get('user')  # assuming students submit their own
+            student_id = session.get('user')
             date_str = request.form.get('date')
             time_str = request.form.get('time')
             subject = request.form.get('subject')
@@ -23,20 +27,11 @@ def attendance():
                 flash("All fields are required.", "error")
                 return redirect(url_for('attendance.attendance'))
 
-            date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            time = datetime.strptime(time_str, '%H:%M').time()
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+            time_obj = datetime.strptime(time_str, '%H:%M').time()
 
-            record = Attendance(
-                student_id=student_id,
-                date=date,
-                time=time,
-                subject=subject,
-                status=status
-            )
-            db.session.add(record)
-            db.session.commit()
-
-            flash("Attendance recorded successfully ✅", "success")
+            result = mark_attendance(student_id, subject, date_obj, time_obj, status)
+            flash(result["message"], "success")
             return redirect(url_for('attendance.attendance'))
 
         except Exception as e:
@@ -50,7 +45,7 @@ def attendance():
 @attendance_bp.route('/attendance/bulk', methods=['GET', 'POST'])
 def bulk_attendance():
     if 'user' not in session or session.get('role') != 'admin':
-        flash("Only admins can mark bulk attendance 😤", "error")
+        flash("Only admins can mark bulk attendance.", "error")
         return redirect(url_for('auth.login'))
 
     if request.method == 'GET':
@@ -58,7 +53,7 @@ def bulk_attendance():
 
     try:
         data = request.get_json() or request.form
-        student_ids = data.get('student_ids')  # expect list from JS
+        student_ids = data.get('student_ids')
         subject = data.get('subject')
         date_str = data.get('date')
         time_str = data.get('time')
@@ -67,25 +62,14 @@ def bulk_attendance():
         if not all([student_ids, subject, date_str, time_str, status]):
             return jsonify({'error': 'Missing required fields'}), 400
 
-        # If it's a string, try to parse it
         if isinstance(student_ids, str):
             student_ids = student_ids.split(',')
 
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        time = datetime.strptime(time_str, '%H:%M').time()
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        time_obj = datetime.strptime(time_str, '%H:%M').time()
 
-        for sid in student_ids:
-            record = Attendance(
-                student_id=sid.strip(),
-                date=date,
-                time=time,
-                subject=subject,
-                status=status
-            )
-            db.session.add(record)
-
-        db.session.commit()
-        return jsonify({'message': 'Bulk attendance recorded successfully ✅'})
+        result = mark_class_attendance(student_ids, subject, date_obj, time_obj, status)
+        return jsonify(result), 200
 
     except Exception as e:
         return jsonify({'error': f"Something went wrong: {str(e)}"}), 500
@@ -128,10 +112,6 @@ def admin_report_api():
 # --------------------- Export CSV Endpoint ---------------------
 @attendance_bp.route('/api/attendance/export/csv', methods=['GET'])
 def export_attendance_csv():
-    from io import StringIO
-    import csv
-    from flask import Response
-
     if 'user' not in session or session.get('role') != 'admin':
         return jsonify({'error': 'Access denied'}), 403
 
@@ -150,16 +130,16 @@ def export_attendance_csv():
     records = query.all()
 
     si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow(['Student ID', 'Subject', 'Date', 'Time', 'Status'])
+    writer = csv.writer(si)
+    writer.writerow(['Student ID', 'Subject', 'Date', 'Time', 'Status'])
 
-    for r in records:
-        cw.writerow([
-            r.student_id,
-            r.subject,
-            r.date.strftime('%Y-%m-%d'),
-            r.time.strftime('%H:%M'),
-            r.status
+    for record in records:
+        writer.writerow([
+            record.student_id,
+            record.subject,
+            record.date.strftime('%Y-%m-%d'),
+            record.time.strftime('%H:%M'),
+            record.status
         ])
 
     output = si.getvalue()

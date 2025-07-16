@@ -1,8 +1,5 @@
 # models/user_model.py
 
-# Simulated in-memory user "database"
-# Pro tip: swap this with real DB later, no sweat
-
 users = {
     "admin": {
         "password": "admin123",
@@ -18,8 +15,8 @@ users = {
 
 def validate_login(username: str, password: str):
     """
-    Checks if username + password combo is legit.
-    Returns user dict with username and role if valid; else False.
+    Validates username and password.
+    Returns user info if credentials match; otherwise returns False.
     """
     user = users.get(username)
     if user and user["password"] == password:
@@ -31,6 +28,6 @@ def validate_login(username: str, password: str):
 
 def get_user_details(username: str):
     """
-    Returns detailed info about the user (full name, role, etc.).
+    Fetches user profile details.
     """
     return users.get(username)
